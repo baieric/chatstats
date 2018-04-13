@@ -8,7 +8,9 @@ from a message in the chat (format: date,sender,content)
 import re
 import sys
 import os
+import string
 from datetime import date, timedelta, datetime
+import emoji
 
 import util
 
@@ -108,9 +110,17 @@ def format_msg(line):
 
     # TODO remove this line after debugging
     if "emoticon" in line:
-        print line
+        print(line)
 
     return line.strip()
+
+def normalize(word):
+    word = word.lower().strip(string.punctuation).replace("’", "\'")
+    # remove all emojis :(
+    for c in word:
+        if c in emoji.UNICODE_EMOJI:
+            return None
+    return word
 
 def make_csv(outputfolder):
     if not os.path.exists(outputfolder):
@@ -183,11 +193,60 @@ def make_csv(outputfolder):
             if len(line) > 0:
                 msgs.append(line)
             idx += 1
-    return outfile
+
+    wordfile = '{}/words.csv'.format(outputfolder)
+    with open(wordfile, 'w+') as csv:
+        current = rawchat[0]
+        if user1 == current:
+            next = user2
+        else:
+            next = user1
+        idx = 1
+        word_dict = {current: dict(), next: dict()}
+
+        csv.write("sender,word,count\n")
+        while True:
+            line = rawchat[idx]
+            if idx == len(rawchat) - 1:
+                break
+
+            date = get_date(line)
+            # TODO we can do a check if the date is >= previous date, for error checking maybe
+            if date is not None:
+                tmp_idx = idx
+                while rawchat[idx+1] not in [current, next]:
+                    # TODO we're skipping system messages right now, assuming we did not improperly get date
+                    # TODO perhaps we can use the system message data as well
+                    idx += 1
+                if rawchat[idx+1] != current:
+                    tmp = next
+                    next = current
+                    current = tmp
+                idx += 2
+                continue
+
+            line = format_msg(line)
+            if len(line) > 0:
+                words = [normalize(x) for x in line.split()]
+                words = [x for x in words if x is not None and len(x) > 0]
+                for word in words:
+                    if word not in word_dict[current]:
+                        word_dict[current][word] = 1
+                    else:
+                        word_dict[current][word] += 1
+            idx += 1
+        for sender, word_count in word_dict.items():
+            for word, count in word_count.items():
+                csv.write("{},{},{}\n".format(
+                    util.to_csv_str(sender),
+                    util.to_csv_str(word),
+                    count
+                ))
+    return outfile, wordfile
 
 def main(argv):
     if len(argv) != 1:
-        print 'Usage: {} <outputfolder>'.format(sys.argv[0])
+        print('Usage: {} <outputfolder>'.format(sys.argv[0]))
         sys.exit(2)
     outputfolder = "generated/{}".format(argv[0])
 

@@ -9,14 +9,14 @@ from make_graphs import plot_graphs
 
 def main(argv):
     if len(argv) != 1:
-        print 'Usage: {} <outputfolder>'.format(sys.argv[0])
+        print("Usage: {} <outputfolder>".format(sys.argv[0]))
         sys.exit(2)
     outputfolder = "generated/{}".format(argv[0])
 
-    chatfile = make_csv(outputfolder)
+    chatfile, wordfile = make_csv(outputfolder)
 
     graph_dir = "{}/graphs".format(outputfolder)
-    plot_graphs(chatfile, graph_dir)
+    plot_graphs(chatfile, wordfile, graph_dir)
 
 if __name__ == "__main__":
     main(sys.argv[1:])

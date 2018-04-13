@@ -13,8 +13,8 @@ You can see the results of Chat Stats here: TODO
 You will need the following installed:
 
 * Git
-* Python
-* Pip
+* Python3
+* Pip3
 
 ### Step One: Scraping Conversation Data
 
@@ -40,7 +40,7 @@ git clone https://github.com/baieric/chatstats.git
 ```
 2. Install the dependencies:
 ```
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 ```
 
 ### Step Three: Generate Graphs!
@@ -49,7 +49,7 @@ pip install -r requirements.txt
 
 Simply run:
 ```
-python chatstats.py <output_folder>
+python3 chatstats.py <output_folder>
 ```
 This creates a directory `/generated/<output_folder>` in your `chatstats` folder. Here you can see the `chat.csv` file used to create all the graphs, and a `graphs` folder with every graph!
 
