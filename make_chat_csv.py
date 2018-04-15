@@ -250,7 +250,7 @@ def main(argv):
     if len(argv) != 1:
         print('Usage: {} <outputfolder>'.format(sys.argv[0]))
         sys.exit(2)
-    outputfolder = "generated/{}".format(argv[0])
+    outputfolder = "my_data/{}".format(argv[0])
 
     make_csv(outputfolder)
 

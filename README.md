@@ -45,8 +45,24 @@ pip3 install -r requirements.txt
 ```
 python3 chatstats.py <conversation_url>
 ```
-This creates a directory in `chatstats/generated/` with all the graphs saved as images, as well as some underlying data files used to create those graphs.
+This creates a folder in `chatstats/my_data/` with all the graphs in image files, as well as some underlying data files used to create those graphs.
 
 ## Advanced Usage
 
-TODO
+If you want to make your own graphs or otherwise extend ChatStats, keep reading.
+
+There are two main steps involved in the `chatstats.py` command:
+
+1. Parsing the HTML of the conversation page into csv files
+2. Manipulating the data in the csv files to generate the graphs
+
+Since both steps can take a long time with large data, you may be interested in only doing one or the other.
+
+To parse facebook HTML, run:
+```
+python3 fb_parser.py <conversation_url>
+```
+To generate graphs, you need the path to the specific `mydata/chat_123_firstname-lastname` subfolder of the chat you parsed previously. Run:
+```
+python3 plot_graphs.py <chatstats_chat_folder>
+```

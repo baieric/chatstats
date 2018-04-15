@@ -3,6 +3,7 @@
 ## New Functionality
 
 * word count CSV
+* fix how stickers look in graphs
 
 
 ## New Graph Ideas
