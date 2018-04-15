@@ -5,6 +5,8 @@ converts the raw chat text into a CSV file "chat.csv", where each line is a line
 from a message in the chat (format: date,sender,content)
 '''
 
+# TODO dead code, remove when possible
+
 import re
 import sys
 import os
