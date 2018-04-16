@@ -47,6 +47,8 @@ python3 chatstats.py <conversation_url>
 ```
 This creates a folder in `chatstats/my_data/` with all the graphs in image files, as well as some underlying data files used to create those graphs.
 
+Have fun!
+
 ## Advanced Usage
 
 If you want to make your own graphs or otherwise extend ChatStats, keep reading.
@@ -82,8 +84,11 @@ ChatStats generates two CSV files, `messages.csv` and `words.csv`
 * **reactions** contains a list of pairs of the form `['👍', 'Jane Doe']`, indicating what reacts the message received
 
 **words.csv** records a count of every word or emoji used by each person. Its columns are:
-"sender","type","word","occurrences"
 * **sender**: full name of the word sender, e.g. "Jane Doe"
 * **type**: one of `text | emoji`
 * **word**: the word or emoji
 * **occurrences**: the number of times the sender has said the word or emoji
+
+## Contribute
+
+Feel free to [request a feature](https://github.com/baieric/chatstats/issues/new) or make a pull request.
