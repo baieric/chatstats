@@ -5,6 +5,8 @@ Parses a Facebook conversation HTML file into useful CSV files
 import csv
 import os
 import sys
+import emoji
+import string
 
 from bs4 import BeautifulSoup, NavigableString
 from datetime import date, timedelta, datetime
@@ -51,10 +53,6 @@ def parse_msg(tag):
 
         elif second_child.name == "br":
             # an attached link or plan
-            # TODO debug print
-            print("br found in msg body")
-            print(tag)
-
             if child.string == " Plan Created: ":
                 type = "plan"
                 body = [x.string for x in tag.contents[2::2]]
@@ -74,6 +72,7 @@ def parse_msg(tag):
             return type, body, None
 
         else:
+            # text with an attached file
             type, files = fbutil.get_files([child for child in child.next_siblings])
             type = "text+{}".format(type)
             return type, body, files
@@ -146,12 +145,67 @@ def make_message_csv(thread, folder):
                 continue
 
             else:
-                print(tag)
                 if tag.has_attr("class"):
                     raise ValueError('unexpected message type: {} class={}'.format(tag.name, tag["class"]))
                 else:
                     raise ValueError('unexpected message type: {}'.format(tag.name))
     # end make_message_csv
+
+def make_word_csv(folder):
+    '''
+    counts words and emoji usage for every user
+    Note this depends on messages.csv to be made
+    '''
+    messagefile = '{}/messages.csv'.format(folder)
+    with open(messagefile) as messages:
+        msgdata = csv.reader(messages)
+
+        wordfile = '{}/words.csv'.format(folder)
+        counter = dict()
+        with open(wordfile, 'w+') as csvfile:
+            out = csv.writer(csvfile, quoting=csv.QUOTE_ALL)
+            out.writerow(['sender', 'type', 'word', 'occurrences'])
+
+            for _date, sender, type, message, _files, _reacts in msgdata:
+                if not type.startswith("text"):
+                    # only looking to get data from text messages
+                    continue
+
+                if sender not in counter:
+                    counter[sender] = dict()
+
+                message = message.split()
+
+                # count emojis
+                for w in message:
+                    if w in constants.EMOJI_SHORTCUTS:
+                        if constants.EMOJI_SHORTCUTS[w] in counter[sender]:
+                            counter[sender][constants.EMOJI_SHORTCUTS[w]] += 1
+                        else:
+                            counter[sender][constants.EMOJI_SHORTCUTS[w]] = 1
+                    else:
+                        for c in w:
+                            if c in emoji.UNICODE_EMOJI:
+                                if c in counter[sender]:
+                                    counter[sender][c] += 1
+                                else:
+                                    counter[sender][c] = 1
+
+                # count words
+                for x in [word.lower().strip(string.punctuation).replace("’", "\'") for word in message]:
+                    if len(x) == 0:
+                        continue
+                    if x in counter[sender]:
+                        counter[sender][x] += 1
+                    else:
+                        counter[sender][x] = 1
+
+            # write to csv file
+            for user, words in counter.items():
+                for word, count in words.items():
+                    type = "emoji" if word in emoji.UNICODE_EMOJI else "text"
+                    out.writerow([user, type, word, count])
+
 
 def make_csvs(chat_html_file):
     """
@@ -177,10 +231,13 @@ def make_csvs(chat_html_file):
     with open(outfile, 'w+') as file:
         file.write(filename.rsplit('/', 2)[0])
 
-    print("Generating csv files...")
+    print("Generating CSV files...")
     thread = soup.find_all("div", "thread")[0]
 
     make_message_csv(thread, output_folder)
+    make_word_csv(output_folder)
+
+    print("CSV files completed.")
 
     return output_folder
 

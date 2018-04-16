@@ -19,5 +19,7 @@ def main(argv):
 
     plot_graphs(csvs, output_folder)
 
+    print("Results saved in {}".format(output_folder))
+
 if __name__ == "__main__":
     main(sys.argv)

@@ -33,8 +33,6 @@ def get_files(tags):
         type = "file"
     else:
         type = "badmedia"
-        # TODO debug print
-        print(tags)
 
     for item in tags:
         file = item[attr]

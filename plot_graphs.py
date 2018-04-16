@@ -6,8 +6,10 @@ import util
 from grapher import graphers_to_plot
 
 def plot_graphs(csvs, output_folder):
+    print("Plotting graphs...")
     for grapher in graphers_to_plot:
         grapher.graph(csvs, output_folder)
+    print("Graphs completed")
 
 def main(argv):
     if len(argv) != 2:
