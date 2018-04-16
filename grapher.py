@@ -12,7 +12,6 @@ import datetime
 import matplotlib.pyplot as plt
 from matplotlib.image import BboxImage
 from matplotlib.transforms import Bbox, TransformedBbox
-import matplotlib.font_manager as font_manager
 
 import constants
 
@@ -396,12 +395,6 @@ class EmojiCountGraph(Grapher):
             pad_inches=0.5
         )
         plot.get_figure().clf()
-
-def add_custom_fonts():
-    font_dirs = ['fonts']
-    font_files = font_manager.findSystemFonts(fontpaths=font_dirs)
-    font_list = font_manager.createFontList(font_files)
-    font_manager.fontManager.ttflist.extend(font_list)
 
 graphers_to_plot = [
     SenderMessagesGraph(),
