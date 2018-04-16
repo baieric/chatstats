@@ -14,6 +14,7 @@ from matplotlib.image import BboxImage
 from matplotlib.transforms import Bbox, TransformedBbox
 
 import constants
+import util
 
 class Grapher(object):
     '''
@@ -379,10 +380,11 @@ class EmojiCountGraph(Grapher):
             order=to_plot_2.groupby('word').occurrences.sum().sort_values(ascending=False).head(15).index,
         )
 
-        add_custom_fonts()
+        util.add_custom_fonts()
 
         for item in plot.get_xticklabels():
             item.set_family('Symbola')
+            # print(item.get_text())
 
         plot.set(
             xlabel="Most common emoji",
