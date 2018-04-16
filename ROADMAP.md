@@ -5,8 +5,14 @@
 * fix how stickers look in graphs
 * figure out how to show better emojis in graphs
 * get consistent colours for the legend
+* fix/suppress warnings in plot_graph.py
 
 ## New Graph Ideas
+
+Message counting:
+
+* Top messaging months
+* Longest calls, maybe a time distribution of calls as well
 
 Word counting:
 

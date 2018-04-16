@@ -384,7 +384,11 @@ class EmojiCountGraph(Grapher):
 
         for item in plot.get_xticklabels():
             item.set_family('Symbola')
-            # print(item.get_text())
+
+        emojis = [x.get_text() for x in plot.get_xticklabels()]
+        print("The graph plotting tool does not have the best support for emojis, so you may not be able to read them in the Emoji graph.")
+        print("Here are your top emojis:")
+        print("   ".join(["{}. {}".format(i+1, e) for i, e in enumerate(emojis)]))
 
         plot.set(
             xlabel="Most common emoji",

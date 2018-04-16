@@ -28,7 +28,7 @@ def get_files(tags):
     elif url.startswith("messages/videos"):
         type = "video"
     elif url.startswith("messages/audio"):
-        type = "video"
+        type = "audio"
     elif url.startswith("messages/files"):
         type = "file"
     else:

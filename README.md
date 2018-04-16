@@ -1,6 +1,6 @@
 # ChatStats
 
-ChatsStats is a data visualizer for a Facebook Messenger conversation. Try it out with your group chats or your chat with a significant other. You don't need to be an experienced programmer to use it!
+ChatsStats is a data visualizer for a Facebook Messenger conversation. Try it out with your group chats or your significant other. You don't need to be an experienced programmer to use it!
 
 ## Example
 
@@ -51,6 +51,8 @@ This creates a folder in `chatstats/my_data/` with all the graphs in image files
 
 If you want to make your own graphs or otherwise extend ChatStats, keep reading.
 
+### Specific Commands
+
 There are two main steps involved in the `chatstats.py` command:
 
 1. Parsing the HTML of the conversation page into csv files
@@ -66,3 +68,22 @@ To generate graphs, you need the path to the specific `mydata/chat_123_firstname
 ```
 python3 plot_graphs.py <chatstats_chat_folder>
 ```
+
+### CSV formats
+
+ChatStats generates two CSV files, `messages.csv` and `words.csv`
+
+**messages.csv** records every message in the conversation. Its columns are:
+* **date**: datetime in "yyyy-MM-dd HH:mm:ss" format
+* **sender**: full name of the message sender, e.g. "Jane Doe"
+* **type**: one of `text | call | videochat | plan` or one of the file types `photo | sticker | gif | video | audio | file`. Additionally, a text can have a file attached, which has type `text+<file_type>`. Finally, there are broken links with type `badmedia`
+* **message**: contains the text for type `text` or details for types `call | videochat | plan`. Empty for other types
+* **files**: contains a list of files for file types, otherwise empty
+* **reactions** contains a list of pairs of the form `['👍', 'Jane Doe']`, indicating what reacts the message received
+
+**words.csv** records a count of every word or emoji used by each person. Its columns are:
+"sender","type","word","occurrences"
+* **sender**: full name of the word sender, e.g. "Jane Doe"
+* **type**: one of `text | emoji`
+* **word**: the word or emoji
+* **occurrences**: the number of times the sender has said the word or emoji
