@@ -2,9 +2,7 @@
 
 ChatsStats is a data visualizer for a Facebook Messenger conversation. Try it out with your group chats or your significant other. You don't need to be an experienced programmer to use it!
 
-## Example
-
-You can see the results of Chat Stats here: TODO
+TODO: Examples here
 
 ## How To
 
@@ -47,7 +45,11 @@ python3 chatstats.py <conversation_url>
 ```
 This creates a folder in `chatstats/my_data/` with all the graphs in image files, as well as some underlying data files used to create those graphs.
 
-Have fun!
+Have fun! If you need help deciding what conversations you want to try, check out the `messages` folder in your Facebook data and sort by size. Try it out on all of your largest conversations!
+
+## Contribute
+
+Feel free to [request a feature](https://github.com/baieric/chatstats/issues/new) or make a pull request.
 
 ## Advanced Usage
 
@@ -88,7 +90,3 @@ ChatStats generates two CSV files, `messages.csv` and `words.csv`
 * **type**: one of `text | emoji`
 * **word**: the word or emoji
 * **occurrences**: the number of times the sender has said the word or emoji
-
-## Contribute
-
-Feel free to [request a feature](https://github.com/baieric/chatstats/issues/new) or make a pull request.

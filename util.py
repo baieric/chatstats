@@ -12,12 +12,13 @@ def get_csvs(chat_folder):
     '''
     return a dictionary of all generated csv files
     '''
-    messages_csv = '{}/messages.csv'.format(chat_folder)
+    data_folder = '{}/data'.format(chat_folder)
+    messages_csv = '{}/messages.csv'.format(data_folder)
     if not os.path.exists(messages_csv):
         print('messages.csv not found. Generate messages.csv with fb_parser.py')
         sys.exit(2)
 
-    words_csv = '{}/words.csv'.format(chat_folder)
+    words_csv = '{}/words.csv'.format(data_folder)
     if not os.path.exists(words_csv):
         print('words.csv not found. Generate words.csv with fb_parser.py')
         sys.exit(2)

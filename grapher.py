@@ -159,7 +159,6 @@ class PerMonthMessagesGraph(Grapher):
         to_plot = df.groupby(['date', 'sender'], as_index=False)[['message']].count()
 
         num_months = len(to_plot['date'].unique().tolist())
-        fifth = int(num_months / 5)
         sns.set(style="darkgrid")
         plot = sns.lmplot(
             data=to_plot,
@@ -171,7 +170,11 @@ class PerMonthMessagesGraph(Grapher):
             palette = "muted"
         )
         plot.set(xlabel="Months", ylabel="Messages sent")
+
+        # set xticks TODO doesn't work well if fifth is a small number
+        fifth = int(num_months / 5)
         plot.set(xticks=[0, fifth * 1, fifth * 2, fifth * 3, fifth * 4, num_months - 1])
+
         plot.fig.savefig(
             "{}/per_month_messages.png".format(output_folder),
             bbox_inches='tight',
@@ -202,10 +205,11 @@ class TopStickersMessagesGraph(Grapher):
             palette = "muted"
         )
 
-        with open("{}/message_dir.txt".format(output_folder)) as f:
+        with open("{}/data/message_dir.txt".format(output_folder)) as f:
             message_dir = f.readlines()[0]
 
         sticker_files = ["{}/{}".format(message_dir, t.get_text())  for t in plot.get_xticklabels()]
+        print(sticker_files)
 
         def plotImage(x, y, im):
             # TODO hard-coded size of images, breaks in some cases
@@ -247,7 +251,7 @@ class WordCountGraph(Grapher):
         # ignore contractions
         df = df[~df.word.str.contains("\'", na=False)]
         # text only
-        df = df[df['type'] == 'text']
+        df = df[df['type'].str.startswith('text')]
 
         # filter out most common words
         with open("word_lists/10000_most_common_words.txt") as f:
@@ -266,7 +270,7 @@ class WordCountGraph(Grapher):
             hue=to_plot_2['sender'],
             data=to_plot_2,
             palette = "muted",
-            order=to_plot_2.groupby('word').occurrences.sum().sort_values(ascending=False).head(15).index,
+            order=to_plot_2.groupby('word').occurrences.sum().sort_values(ascending=False).head(10).index,
         )
 
         for item in plot.get_xticklabels():
@@ -292,8 +296,8 @@ class NameGraph(Grapher):
         df = pd.read_csv(csvs['words'], sep=',')
 
         names = df.sender.unique().tolist()
-        first_names = [x.split()[0].lower() for x in names]
-        to_plot = df[df['word'].isin(first_names)].groupby(['sender','word'], as_index=False)[['occurrences']].sum()
+        first_names = sorted([x.split()[0].lower() for x in names])
+        to_plot = df[df['word'].isin(first_names)].groupby(['word', 'sender'], as_index=False)[['occurrences']].sum()
 
         sns.set(style="darkgrid")
         plot = sns.barplot(
@@ -327,7 +331,7 @@ class LongWordGraph(Grapher):
         # ignore contractions
         df = df[~df.word.str.contains("\'", na=False)]
         # text only
-        df = df[df['type'] == 'text']
+        df = df[df['type'].str.startswith('text')]
 
         to_plot_2 = df.groupby(['sender','word'], as_index=False)[['occurrences']].sum()
 
@@ -341,7 +345,7 @@ class LongWordGraph(Grapher):
             hue=to_plot_2['sender'],
             data=to_plot_2,
             palette = "muted",
-            order=to_plot_2.groupby('word').occurrences.sum().sort_values(ascending=False).head(15).index,
+            order=to_plot_2.groupby('word').occurrences.sum().sort_values(ascending=False).head(10).index,
         )
 
         for item in plot.get_xticklabels():
@@ -377,7 +381,7 @@ class EmojiCountGraph(Grapher):
             hue=to_plot_2['sender'],
             data=to_plot_2,
             palette = "muted",
-            order=to_plot_2.groupby('word').occurrences.sum().sort_values(ascending=False).head(15).index,
+            order=to_plot_2.groupby('word').occurrences.sum().sort_values(ascending=False).head(10).index,
         )
 
         util.add_custom_fonts()
@@ -386,8 +390,7 @@ class EmojiCountGraph(Grapher):
             item.set_family('Symbola')
 
         emojis = [x.get_text() for x in plot.get_xticklabels()]
-        print("The graph plotting tool does not have the best support for emojis, so you may not be able to read them in the Emoji graph.")
-        print("Here are your top emojis:")
+        print("Your top emojis:")
         print("   ".join(["{}. {}".format(i+1, e) for i, e in enumerate(emojis)]))
 
         plot.set(

@@ -221,21 +221,22 @@ def make_csvs(chat_html_file):
     with open(filename) as fp:
         soup = BeautifulSoup(fp, 'lxml')
 
-    # make output folder
+    # make chat folder
     output_folder = util.get_output_folder(filename, soup.title.string)
-    if not os.path.exists(output_folder):
-        os.makedirs(output_folder)
+    data_folder = '{}/data'.format(output_folder)
+    if not os.path.exists(data_folder):
+        os.makedirs(data_folder)
 
     # save reference to fb folder
-    outfile = '{}/message_dir.txt'.format(output_folder)
+    outfile = '{}/message_dir.txt'.format(data_folder)
     with open(outfile, 'w+') as file:
         file.write(filename.rsplit('/', 2)[0])
 
     print("Generating CSV files...")
     thread = soup.find_all("div", "thread")[0]
 
-    make_message_csv(thread, output_folder)
-    make_word_csv(output_folder)
+    make_message_csv(thread, data_folder)
+    make_word_csv(data_folder)
 
     print("CSV files completed.")
 

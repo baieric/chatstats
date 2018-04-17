@@ -1,11 +1,19 @@
-# Roadmap of new features
+# Roadmap
 
-## New Functionality
+## Bug Fixes and Improvements
 
 * fix how stickers look in graphs
 * figure out how to show better emojis in graphs
 * get consistent colours for the legend
 * fix/suppress warnings in plot_graph.py
+* get better word lists for filtering
+* auto-detect what properties to use for graphs based on number of people in the chat, number of messages, etc. ?
+* clean up sticker data: multiple copies of thumbs up sticker
+
+## Web UI Idea
+
+* A web UI where you can paste your facebook data folder, and the UI will let you search conversations, and clicking them will generate the graphs!
+* UI can list chats by size as well.
 
 ## New Graph Ideas
 
@@ -13,12 +21,15 @@ Message counting:
 
 * Top messaging months
 * Longest calls, maybe a time distribution of calls as well
+* Days with the most positive emojis
+* messages with the most reacts
+* Do people use hashtags in chat? Getting a list of top hashtags would be cool
 
 Word counting:
 
 * most swearing
 * which words are most unique to each person? (hard)
-* punctuation usage?
+* punctuation usage? Count: ? @ # ! $
 
 Message content analysis (may require preprocessing):
 
