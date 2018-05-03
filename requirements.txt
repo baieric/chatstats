@@ -1,6 +1,3 @@
 emoji
-pandas
 seaborn
-beautifulsoup4
-lxml
-matplotlib
+ftfy

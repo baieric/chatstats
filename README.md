@@ -20,9 +20,10 @@ You will need the following installed:
 
 To get your entire chat history:
 
-1. Go to [https://www.facebook.com/settings](https://www.facebook.com/settings). At the bottom of the settings list is an option "Download a copy of your Facebook data." Select it and follow the instructions.
-2. Facebook takes a few minutes to generate a download link for you. You can do **Step Two** while waiting for the link.
-3. Once you receive an email from Facebook with a download link, save the file to your computer and unzip it. Note that this is very sensitive information, so be careful storing it.
+1. Go to [https://www.facebook.com/dyi](https://www.facebook.com/dyi). Select **"Download Your Information"**.
+2. On this page, change the Format option to `JSON`. You can deselect all information except for `Messages` to lower the size of your download. The other options can be left default or customized to your liking.
+3. Facebook takes a few minutes to generate a download link for you. You can do **Step Two** while waiting for the link.
+4. Once you receive notification from Facebook with a download link, save the file to your computer and unzip it. Note that this is very sensitive information, so be careful storing it.
 
 ### Step Two: Set Up ChatStats
 
@@ -37,56 +38,36 @@ pip3 install -r requirements.txt
 
 ### Step Three: Generate Graphs!
 
-1. Go to your Facebook data folder, and open `index.htm` in your browser.
-2. Go to the "Messages" page on the left navbar. Find the conversation you want to use and go to its page.
-3. Copy the page's URL from your browser, and run the following command:
+1. Go to your Facebook messages folder, and find the folder containing the chat you want to use.
+2. Use the path of that folder to run the following command:
 ```
-python3 chatstats.py <conversation_url>
+python3 chatstats.py <chat_folder>
 ```
-This creates a folder in `chatstats/my_data/` with all the graphs in image files, as well as some underlying data files used to create those graphs.
+This creates a folder in `chatstats/my_data/` with your ChatStats graphs.
 
-Have fun! If you need help deciding what conversations you want to try, check out the `messages` folder in your Facebook data and sort by size. Try it out on all of your largest conversations!
+Have fun! If you need help deciding what conversations to try, [sort your `messages` folder by size](http://dailymactips.com/display-the-size-of-all-your-folders-in-the-mac-finder-window/). Try it out on all of your largest conversations!
 
 ## Contribute
 
-Feel free to [request a feature](https://github.com/baieric/chatstats/issues/new) or make a pull request.
+Feel free to [request a feature](https://github.com/baieric/chatstats/issues/new) or make a pull request. There are ideas for bug fixes, improvements, and new graphs in [the project roadmap](https://github.com/baieric/chatstats/blob/master/ROADMAP.md).
 
-## Advanced Usage
+### Getting Started With the Codebase
 
-If you want to make your own graphs or otherwise extend ChatStats, keep reading.
+To create a new graph, create a new `Grapher` object in `grapher.py`. The file has many examples to help you get started.
 
-### Specific Commands
-
-There are two main steps involved in the `chatstats.py` command:
-
-1. Parsing the HTML of the conversation page into csv files
-2. Manipulating the data in the csv files to generate the graphs
-
-Since both steps can take a long time with large data, you may be interested in only doing one or the other.
-
-To parse facebook HTML, run:
+ChatStats uses graphers in this code snippet from `chatstats.py`:
 ```
-python3 fb_parser.py <conversation_url>
-```
-To generate graphs, you need the path to the specific `mydata/chat_123_firstname-lastname` subfolder of the chat you parsed previously. Run:
-```
-python3 plot_graphs.py <chatstats_chat_folder>
+# generate graphs that use message data
+messages = clean_data(pd.DataFrame(json_data["messages"]))
+for grapher in message_graphers:
+    grapher.graph(messages, output_folder, parent_folder)
+
+# generate graphs that use word data
+words = word_data(messages)
+for grapher in word_graphers:
+    grapher.graph(words, output_folder, parent_folder)
 ```
 
-### CSV formats
+Here we create two different dataframes, `messages` and `words`, which are called by graphers in corresponding `message_graphers` and `word_graphers` lists. For ChatStats to use a newly created `Grapher`, it must be added to the appropriate list.
 
-ChatStats generates two CSV files, `messages.csv` and `words.csv`
-
-**messages.csv** records every message in the conversation. Its columns are:
-* **date**: datetime in "yyyy-MM-dd HH:mm:ss" format
-* **sender**: full name of the message sender, e.g. "Jane Doe"
-* **type**: one of `text | call | videochat | plan` or one of the file types `photo | sticker | gif | video | audio | file`. Additionally, a text can have a file attached, which has type `text+<file_type>`. Finally, there are broken links with type `badmedia`
-* **message**: contains the text for type `text` or details for types `call | videochat | plan`. Empty for other types
-* **files**: contains a list of files for file types, otherwise empty
-* **reactions** contains a list of pairs of the form `['👍', 'Jane Doe']`, indicating what reacts the message received
-
-**words.csv** records a count of every word or emoji used by each person. Its columns are:
-* **sender**: full name of the word sender, e.g. "Jane Doe"
-* **type**: one of `text | emoji`
-* **word**: the word or emoji
-* **occurrences**: the number of times the sender has said the word or emoji
+If your graph complex enough that it needs a new dataframe, create it along with a corresponding list of graphers that use it, similar to the above snippet.

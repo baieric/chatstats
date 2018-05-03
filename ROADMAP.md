@@ -8,7 +8,7 @@
 * fix/suppress warnings in plot_graph.py
 * get better word lists for filtering
 * auto-detect what properties to use for graphs based on number of people in the chat, number of messages, etc. ?
-* clean up sticker data: multiple copies of thumbs up sticker
+* toggle for whether to show full names
 
 ## Web UI Idea
 
@@ -19,16 +19,13 @@
 
 Message counting:
 
-* Top messaging months
 * Longest calls, maybe a time distribution of calls as well
 * Days with the most positive emojis
 * messages with the most reacts
-* Do people use hashtags in chat? Getting a list of top hashtags would be cool
 
 Word counting:
 
 * most swearing
-* which words are most unique to each person? (hard)
 * punctuation usage? Count: ? @ # ! $
 
 Message content analysis (may require preprocessing):
