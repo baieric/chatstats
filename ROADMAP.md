@@ -9,6 +9,7 @@
 * get better word lists for filtering
 * auto-detect what properties to use for graphs based on number of people in the chat, number of messages, etc. ?
 * toggle for whether to show full names
+* show warning if two users have the same full name or first name, depending on config
 
 ## Web UI Idea
 
@@ -19,7 +20,7 @@
 
 Message counting:
 
-* Longest calls, maybe a time distribution of calls as well
+* Time distribution of calls
 * Days with the most positive emojis
 * messages with the most reacts
 

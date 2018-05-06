@@ -1,6 +1,6 @@
 # ChatStats
 
-ChatsStats is a data visualizer for a Facebook Messenger conversation. Try it out with your group chats or your significant other. You don't need to be an experienced programmer to use it!
+ChatStats is a data visualizer for a Facebook Messenger conversation. Try it out with your group chats or your significant other. You don't need to be an experienced programmer to use it!
 
 TODO: Examples here
 
@@ -21,9 +21,9 @@ You will need the following installed:
 To get your entire chat history:
 
 1. Go to [https://www.facebook.com/dyi](https://www.facebook.com/dyi). Select **"Download Your Information"**.
-2. On this page, change the Format option to `JSON`. You can deselect all information except for `Messages` to lower the size of your download. The other options can be left default or customized to your liking.
-3. Facebook takes a few minutes to generate a download link for you. You can do **Step Two** while waiting for the link.
-4. Once you receive notification from Facebook with a download link, save the file to your computer and unzip it. Note that this is very sensitive information, so be careful storing it.
+2. On this page, change the Format option to `JSON`. You can deselect all information except for `Messages` to lower the size of your download. The other options can be left default or customized to your liking. Click `Create File` to continue.
+3. Facebook takes a few minutes to generate a download link for you. You can do **Step Two** while waiting for the file.
+4. Once you receive a notification from Facebook with a download link, save the file to your computer and unzip it. Note that this is very sensitive information, so be careful storing it.
 
 ### Step Two: Set Up ChatStats
 
@@ -47,6 +47,10 @@ This creates a folder in `chatstats/my_data/` with your ChatStats graphs.
 
 Have fun! If you need help deciding what conversations to try, [sort your `messages` folder by size](http://dailymactips.com/display-the-size-of-all-your-folders-in-the-mac-finder-window/). Try it out on all of your largest conversations!
 
+### Advanced Configuration
+
+There are some advanced options available in the file `config.py`.
+
 ## Contribute
 
 Feel free to [request a feature](https://github.com/baieric/chatstats/issues/new) or make a pull request. There are ideas for bug fixes, improvements, and new graphs in [the project roadmap](https://github.com/baieric/chatstats/blob/master/ROADMAP.md).
@@ -68,6 +72,6 @@ for grapher in word_graphers:
     grapher.graph(words, output_folder, parent_folder)
 ```
 
-Here we create two different dataframes, `messages` and `words`, which are called by graphers in corresponding `message_graphers` and `word_graphers` lists. For ChatStats to use a newly created `Grapher`, it must be added to the appropriate list.
+Here we create two different dataframes, `messages` and `words`, which are called by graphers in corresponding `message_graphers` and `word_graphers` lists. For ChatStats to use a newly created grapher, it must be added to the appropriate list.
 
-If your graph complex enough that it needs a new dataframe, create it along with a corresponding list of graphers that use it, similar to the above snippet.
+If your graph is complex enough that it needs a new dataframe, create it along with a corresponding list of graphers that use it, similar to the above snippet.

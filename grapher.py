@@ -2,17 +2,14 @@
 Graphers turn dataframes into graphs
 '''
 
-import pandas as pd
-import numpy as np
 import seaborn as sns
-import datetime
 import matplotlib.pyplot as plt
 from matplotlib.image import BboxImage
 from matplotlib.transforms import Bbox, TransformedBbox
-import math
 
 import constants
 import util
+import config
 
 class Grapher(object):
     '''
@@ -27,7 +24,7 @@ class SenderMessagesGraph(Grapher):
     Plots the number of messages sent by each sender
     '''
     def graph(self, data, output_folder, parent_folder):
-        to_plot = data['sender_name'].value_counts()
+        to_plot = data[config.SENDER_COLUMN_NAME].value_counts()
 
         sns.set(style="darkgrid")
         plot = sns.barplot(
@@ -63,9 +60,6 @@ class CallDurationGraph(Grapher):
     '''
     def graph(self, data, output_folder, parent_folder):
         data = data[data['type'] == 'Call'].sort_values('call_duration',ascending=False).head(10)
-        data['date'] = data["datetime"].apply(
-            lambda d : datetime.datetime(year=d.year, month=d.month, day=d.day)
-        ).map(lambda x:x.date())
 
         sns.set(style="darkgrid")
         plot = sns.barplot(
@@ -90,13 +84,13 @@ class WeekdayMessagesGraph(Grapher):
     '''
     def graph(self, data, output_folder, parent_folder):
         data['weekday'] = data['datetime'].dt.weekday_name
-        to_plot = data.groupby(['weekday', 'sender_name'], as_index=False)[['type']].count()
+        to_plot = data.groupby(['weekday', config.SENDER_COLUMN_NAME], as_index=False)[['type']].count()
 
         sns.set(style="darkgrid")
         plot = sns.barplot(
             x=to_plot['weekday'],
             y=to_plot['type'],
-            hue=to_plot['sender_name'],
+            hue=to_plot[config.SENDER_COLUMN_NAME],
             data=to_plot,
             order=constants.WEEKDAYS,
             palette = "muted"
@@ -115,16 +109,12 @@ class TopDaysMessagesGraph(Grapher):
     Plots the top 5 days with most messages
     '''
     def graph(self, data, output_folder, parent_folder):
-        data['date'] = data["datetime"].apply(
-            lambda d : datetime.datetime(year=d.year, month=d.month, day=d.day)
-        ).map(lambda x:x.date())
-
-        to_plot = data.groupby(['date', 'sender_name'], as_index=False)[['type']].count()
+        to_plot = data.groupby(['date', config.SENDER_COLUMN_NAME], as_index=False)[['type']].count()
         sns.set(style="darkgrid")
         plot = sns.barplot(
             x=to_plot['date'],
             y=to_plot['type'],
-            hue=to_plot['sender_name'],
+            hue=to_plot[config.SENDER_COLUMN_NAME],
             data=to_plot,
             order=to_plot.groupby('date').type.sum().sort_values(ascending=False).head(5).index,
             palette = "muted"
@@ -146,14 +136,14 @@ class TimeInDayMessagesGraph(Grapher):
         # get hour
         data['time'] = data['datetime'].dt.time.apply( lambda x: x.hour )
 
-        to_plot = data.groupby(['time', 'sender_name'], as_index=False)[['type']].count().sort_values('time')
+        to_plot = data.groupby(['time', config.SENDER_COLUMN_NAME], as_index=False)[['type']].count().sort_values('time')
 
         sns.set(style="darkgrid")
         plot = sns.barplot(
             data=to_plot,
             x='time',
             y='type',
-            hue='sender_name',
+            hue=config.SENDER_COLUMN_NAME,
             palette = "muted"
         )
         plot.set(xlabel="Hour in Day", ylabel="Messages sent")
@@ -170,27 +160,14 @@ class PerTermMessagesGraph(Grapher):
     Plots the frequency of messages for each 4 month term
     '''
     def graph(self, data, output_folder, parent_folder):
-
-        def to_term(month):
-            if month < 5:
-                return "T1 W"
-            elif month < 9:
-                return "T2 S"
-            else:
-                return "T3 F"
-
-        data['term'] =  pd.to_datetime(data['datetime']).apply(
-            lambda d : "{} {}".format( d.strftime('%Y'), to_term(int(d.strftime('%m'))) )
-        )
-
-        to_plot = data.groupby(['term', 'sender_name'], as_index=False)[['type']].count()
+        to_plot = data.groupby(['term', config.SENDER_COLUMN_NAME], as_index=False)[['type']].count()
 
         sns.set(style="darkgrid")
         plot = sns.barplot(
             data=to_plot,
             y='term',
             x='type',
-            hue='sender_name',
+            hue=config.SENDER_COLUMN_NAME,
             orient='h',
             palette = "muted"
         )
@@ -210,15 +187,15 @@ class TopStickersMessagesGraph(Grapher):
     Plots the frequency of messages for time in the day
     '''
     def graph(self, data, output_folder, parent_folder):
-        to_plot = data.groupby(['sticker', 'sender_name'], as_index=False)[['type']].count()
+        to_plot = data.groupby(['sticker', config.SENDER_COLUMN_NAME], as_index=False)[['type']].count()
 
         sns.set(style="darkgrid")
         plot = sns.barplot(
             x=to_plot['sticker'],
             y=to_plot['type'],
-            hue=to_plot['sender_name'],
+            hue=to_plot[config.SENDER_COLUMN_NAME],
             data=to_plot,
-            hue_order=to_plot.sender_name.unique(),
+            hue_order=to_plot[config.SENDER_COLUMN_NAME].unique(),
             order=to_plot.groupby('sticker').type.sum().sort_values(ascending=False).head(10).index,
             palette = "muted"
         )
@@ -255,24 +232,63 @@ class TopStickersMessagesGraph(Grapher):
         )
         plot.get_figure().clf()
 
+class WordsPerMessageGraph(Grapher):
+    '''
+    Plots the average number of words per message
+    '''
+    def graph(self, data, output_folder, parent_folder):
+        data['words'] = data.content.str.strip().str.split()
+        data = data.dropna(subset=['words'])
+        data = data[data['type'] == 'Generic']
+        data['num_words'] = data['words'].apply(lambda x: len(x))
+        to_plot = data.groupby([config.SENDER_COLUMN_NAME], as_index=False)[['num_words']].mean()
+
+        sns.set(style="darkgrid")
+        plot = sns.barplot(
+            data=to_plot,
+            y='num_words',
+            x=config.SENDER_COLUMN_NAME,
+            palette = "muted"
+        )
+        plot.set(ylabel="Average words per message", xlabel="Sender")
+
+        # add number text above each bar
+        for rect, label in zip(plot.patches, to_plot.values.tolist()):
+            if label[1] == 0:
+                continue
+            height = rect.get_height()
+            plot.text(
+                rect.get_x() + rect.get_width()/2,
+                height + 0.1, round(float(label[1]), 2),
+                ha='center',
+                va='bottom'
+            )
+
+        plot.get_figure().savefig(
+            "{}/words_per_message.png".format(output_folder),
+            bbox_inches='tight',
+            pad_inches=0.5
+        )
+        plot.get_figure().clf()
 
 class WordCountGraph(Grapher):
     '''
     Plots the most common words
     '''
     def graph(self, data, output_folder, parent_folder):
+        data = util.group_words_by_sender(data)
         # words only
         data = data[data['type'] == 'word']
         # ignore contractions
         data = data[~data.word.str.contains("\'", na=False)]
-        # ignore single characters
-        data = data[data['word'].str.len() > 1]
+        # ignore words under 4 chars
+        data = data[data['word'].str.len() > 4]
 
         # filter out most common words
         with open("word_lists/common.txt") as f:
             common = f.readlines()
             common = [x.lower().strip() for x in common]
-        to_plot = data.groupby(['sender_name','word'], as_index=False)[['n_w']].sum()
+        to_plot = data.groupby([config.SENDER_COLUMN_NAME,'word'], as_index=False)[['n_w']].sum()
         to_plot = to_plot[~to_plot.word.isin(common)]
 
         # ignore numbers
@@ -282,7 +298,7 @@ class WordCountGraph(Grapher):
         plot = sns.barplot(
             y=to_plot['word'],
             x=to_plot['n_w'],
-            hue=to_plot['sender_name'],
+            hue=to_plot[config.SENDER_COLUMN_NAME],
             data=to_plot,
             palette = "muted",
             orient="h",
@@ -290,7 +306,7 @@ class WordCountGraph(Grapher):
         )
 
         plot.set(
-            ylabel="Most common words (after filtering out common English words)",
+            ylabel="Most common words (after filtering out most common English words)",
             xlabel="Occurrences"
         )
         plot.legend(bbox_to_anchor=(1.04,1), loc="upper left")
@@ -306,16 +322,16 @@ class NameGraph(Grapher):
     Plot who says whose names
     '''
     def graph(self, data, output_folder, parent_folder):
-
-        names = data.sender_name.unique().tolist()
+        data = util.group_words_by_sender(data)
+        names = data[config.SENDER_COLUMN_NAME].unique().tolist()
         first_names = sorted([x.split()[0].lower() for x in names])
-        to_plot = data[data['word'].isin(first_names)].groupby(['word', 'sender_name'], as_index=False)[['n_w']].sum()
+        to_plot = data[data['word'].isin(first_names)].groupby(['word', config.SENDER_COLUMN_NAME], as_index=False)[['n_w']].sum()
 
         sns.set(style="darkgrid")
         plot = sns.barplot(
             x=to_plot['word'],
             y=to_plot['n_w'],
-            hue=to_plot['sender_name'],
+            hue=to_plot[config.SENDER_COLUMN_NAME],
             data=to_plot,
             palette = "muted",
         )
@@ -338,13 +354,14 @@ Plots the most common emojis
 '''
 class EmojiCountGraph(Grapher):
     def graph(self, data, output_folder, parent_folder):
+        data = util.group_words_by_sender(data)
         to_plot = data[data['type'] == 'emoji']
 
         sns.set(style="darkgrid")
         plot = sns.barplot(
             x=to_plot['word'],
             y=to_plot['n_w'],
-            hue=to_plot['sender_name'],
+            hue=to_plot[config.SENDER_COLUMN_NAME],
             data=to_plot,
             palette = "muted",
             order=to_plot.groupby('word')[['n_w']].sum().sort_values('n_w',ascending=False).head(10).index,
@@ -372,19 +389,17 @@ class EmojiCountGraph(Grapher):
         )
         plot.get_figure().clf()
 
-class DistinguishingWordsGraph(Grapher):
+class SenderDistinguishingWordsGraph(Grapher):
     '''
-    Plots the most distinctive words
+    Plots the most distinctive words per sender
     '''
     def graph(self, data, output_folder, parent_folder):
+        data = util.group_words_by_sender(data, get_tfidf=True)
         data = data[data['word'].str.len() > 1]
         data = data[data['type'] == 'word']
-        senders = data.sender_name.unique().tolist()
+        senders = data[config.SENDER_COLUMN_NAME].unique().tolist()
         N = len(senders)
-        rows = math.floor(math.sqrt(N))
-        while(N % rows != 0):
-             rows = rows - 1
-        cols = int(N / rows)
+        rows, cols = util.get_rows_cols(N)
 
         fig, ax = plt.subplots(figsize=(cols * 2, rows * 3), ncols=cols, nrows=rows, squeeze=False)
         plt.suptitle("Our Most Distinguishing Words", y = 1.09, fontsize=20)
@@ -399,8 +414,8 @@ class DistinguishingWordsGraph(Grapher):
 
         for i in range(N):
             ax[int(i / cols)][i % cols].set_title(senders[i], y = 1)
-            to_plot = data[data['sender_name'] == senders[i]]
-            to_plot = to_plot.head(10)[['sender_name','word','tf_idf']]
+            to_plot = data[data[config.SENDER_COLUMN_NAME] == senders[i]]
+            to_plot = to_plot.head(10)[[config.SENDER_COLUMN_NAME,'word','tf_idf']]
             plot = sns.barplot(
                 y=to_plot['word'],
                 x=to_plot['tf_idf'],
@@ -415,7 +430,54 @@ class DistinguishingWordsGraph(Grapher):
             )
 
         fig.savefig(
-            "{}/distinguishing_words.png".format(output_folder),
+            "{}/sender_distinguishing_words.png".format(output_folder),
+            bbox_inches='tight',
+            pad_inches=0.5
+        )
+        fig.clf()
+
+class TermDistinguishingWordsGraph(Grapher):
+    '''
+    Plots the most distinctive words per term
+    '''
+    def graph(self, data, output_folder, parent_folder):
+        data = util.group_words_by_term(data, get_tfidf=True)
+        data = data[data['word'].str.len() > 1]
+        data = data[data['type'] == 'word']
+        terms = sorted(data.term.unique().tolist())
+        N = len(terms)
+        rows, cols = util.get_rows_cols(N)
+
+        fig, ax = plt.subplots(figsize=(cols * 2, rows * 3), ncols=cols, nrows=rows, squeeze=False)
+        plt.suptitle("Each Term's Most Distinguishing Words", y = 1.09, fontsize=20)
+        plt.subplots_adjust(
+            left    =  0.2,
+            bottom  =  0.1,
+            right   =  2,
+            top     =  0.9,
+            wspace  =  0.5,
+            hspace  =  1.1
+        )
+
+        for i in range(N):
+            ax[int(i / cols)][i % cols].set_title(terms[i], y = 1)
+            to_plot = data[data['term'] == terms[i]]
+            to_plot = to_plot.head(10)[['term','word','tf_idf']]
+            plot = sns.barplot(
+                y=to_plot['word'],
+                x=to_plot['tf_idf'],
+                data=to_plot,
+                palette = "muted",
+                orient="h",
+                ax=ax[int(i / cols)][i % cols]
+            )
+            plot.set(
+                ylabel="Most distinguishing words",
+                xlabel="Uniqueness Score"
+            )
+
+        fig.savefig(
+            "{}/term_distinguishing_words.png".format(output_folder),
             bbox_inches='tight',
             pad_inches=0.5
         )
@@ -426,13 +488,14 @@ class HashtagGraph(Grapher):
     Plots the most used hashtags
     '''
     def graph(self, data, output_folder, parent_folder):
+        data = util.group_words_by_sender(data)
         to_plot = data[data['type'] == 'hashtag']
 
         sns.set(style="darkgrid")
         plot = sns.barplot(
             y=to_plot['word'],
             x=to_plot['n_w'],
-            hue=to_plot['sender_name'],
+            hue=to_plot[config.SENDER_COLUMN_NAME],
             data=to_plot,
             palette = "muted",
             orient="h",
@@ -459,15 +522,17 @@ message_graphers = [
     TimeInDayMessagesGraph(),
     PerTermMessagesGraph(),
     TopStickersMessagesGraph(),
+    WordsPerMessageGraph(),
 ]
 
 word_graphers = [
     EmojiCountGraph(),
     NameGraph(),
-    DistinguishingWordsGraph(),
+    SenderDistinguishingWordsGraph(),
+    TermDistinguishingWordsGraph(),
 ]
 
 # Unused:
-# WordCountGraph(),
 # HashtagGraph(),
 # CallDurationGraph(),
+# WordCountGraph(),

@@ -5,22 +5,34 @@ Core functionality: use message data json to output graphs
 import os
 import sys
 import pandas as pd
-import numpy as np
 import json
 import string
 import emoji
 import ftfy
+import datetime
 
 from grapher import message_graphers, word_graphers
 import constants
+import config
+import util
 
 def clean_data(data):
     '''
     Augment the raw Facebook data for our graphing use cases
     '''
     # set timezone
-    TIMEZONE = 'US/Eastern'
-    data['datetime'] = pd.DatetimeIndex(pd.to_datetime(data['timestamp'], unit='s')).tz_localize('UTC').tz_convert(TIMEZONE)
+    data['datetime'] = pd.DatetimeIndex(
+        pd.to_datetime(data['timestamp'],unit='s')
+    ).tz_localize('UTC').tz_convert(config.TIMEZONE)
+    # column for just date
+    data['date'] = data["datetime"].apply(
+        lambda d : datetime.datetime(year=d.year, month=d.month, day=d.day)
+    ).map(lambda x:x.date())
+
+    # column for term of date
+    data['term'] =  pd.to_datetime(data['datetime']).apply(
+        lambda d : "{} {}".format( d.strftime('%Y'), util.to_term(int(d.strftime('%m'))) )
+    )
 
     # clean up sticker data
     data['sticker'] = data['sticker'].apply(lambda s: s['uri'] if not pd.isnull(s) else None)
@@ -40,17 +52,31 @@ def clean_data(data):
 
 def word_data(data):
     '''
-    Creates dataframe of word counts for each participant, including TF-IDF values
+    Creates dataframe of words
 
     This can take a long time to run
     '''
-    data = data[data['type'] == 'Generic']
     data['words'] = data.content.str.strip().str.split()
     data = data.dropna(subset=['words'])
+    data = data[data['type'] == 'Generic']
+
+    def make_row(r, word, type):
+        return (
+            r.sender_name,
+            r.sender_first_name,
+            r.datetime,
+            r.date,
+            r.term,
+            word,
+            type,
+            1
+        )
 
     # create word count dataframe
     rows = list()
-    for row in data[['sender_name', 'words']].iterrows():
+    for row in data[
+        ['sender_name', 'sender_first_name', 'datetime', 'date', 'term', 'words']
+    ].iterrows():
         r = row[1]
         for word in r.words:
             # normalize unicode
@@ -58,42 +84,39 @@ def word_data(data):
             word = ftfy.ftfy(word)
 
             if word in constants.EMOJI_SHORTCUTS:
-                rows.append((r.sender_name, constants.EMOJI_SHORTCUTS[word], 'emoji', 1))
+                rows.append( make_row(r, constants.EMOJI_SHORTCUTS[word], 'emoji') )
             elif word in emoji.UNICODE_EMOJI:
-                rows.append((r.sender_name, word, 'emoji', 1))
-            elif word.startswith("#") and len(word[1:].strip(string.punctuation)) > 0 and not word[1:].isdigit():
-                rows.append((r.sender_name, word, 'hashtag', 1))
+                rows.append( make_row(r, word, 'emoji') )
+            elif util.is_hashtag(word):
+                rows.append( make_row(r, word, 'hashtag') )
             else:
                 for c in word:
                     if c in emoji.UNICODE_EMOJI:
-                        rows.append((r.sender_name, c, 'emoji', 1))
+                        rows.append( make_row(r, c, 'emoji') )
 
                 word = word.lower().strip(string.punctuation)
                 if len(word) > 0:
-                    rows.append((r.sender_name, word, 'word', 1))
+                    rows.append( make_row(r, word, 'word') )
 
-    words = pd.DataFrame(rows, columns=['sender_name', 'word', 'type', 'n_w'])
-    words = words.groupby(['sender_name', 'type', 'word'], as_index=False)[['n_w']].sum()
+    words = pd.DataFrame(rows, columns=[
+        'sender_name',
+        'sender_first_name',
+        'datetime',
+        'date',
+        'term',
+        'word',
+        'type',
+        'n_w'
+    ])
 
-    # calculate tf-idf values
-    senders = words.groupby(['sender_name'], as_index=False)[['n_w']].sum().rename(columns={'n_w': 'n_d'})
-    tf = words.merge(senders, on="sender_name", how="left")
-    tf['tf'] = tf.n_w/tf.n_d
-    c_d = tf.sender_name.nunique()
-    idf = tf.groupby('word', as_index=False)[['sender_name']].count().rename(columns={'sender_name': 'i_d'})
-    idf['idf'] = np.log(c_d/idf.i_d.values)
-    tf_idf = tf.merge(idf, on="word", how="left").rename(columns={'0': 'idf'})
-    tf_idf['tf_idf'] = tf_idf.tf * tf_idf.idf
-    tf_idf = tf_idf.sort_values('tf_idf', ascending=False)
-
-    return tf_idf
+    return words
 
 def main(argv):
     if len(argv) != 2:
         print('Usage: {} <message_folder>'.format(argv[0]))
         sys.exit(2)
 
-    print("Plotting graphs...")
+    print("Plotting graphs... This may take a minute.")
 
     message_arg =  argv[1]
     CHAT_FILE = "message.json"
