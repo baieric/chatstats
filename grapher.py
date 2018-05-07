@@ -31,7 +31,7 @@ class SenderMessagesGraph(Grapher):
             x=to_plot.index,
             y=to_plot.values,
             order=to_plot.index,
-            palette = "muted"
+            palette = config.PALETTE
         )
 
         # add number text above each bar
@@ -46,11 +46,12 @@ class SenderMessagesGraph(Grapher):
                 va='bottom'
             )
 
-        plot.set(xlabel="Sender", ylabel="Messages sent")
+        plt.suptitle("Number of messages sent", y = 1)
+        plot.set(xlabel='', ylabel='')
         plot.get_figure().savefig(
             "{}/sender_messages.png".format(output_folder),
             bbox_inches='tight',
-            pad_inches=0.5
+            pad_inches=config.PAD_INCHES
         )
         plot.get_figure().clf()
 
@@ -67,14 +68,14 @@ class CallDurationGraph(Grapher):
             y=data.date,
             x=data.call_duration,
             orient='h',
-            palette = "muted"
+            palette = config.PALETTE
         )
-
+        plt.suptitle("Longest calls", y = 1)
         plot.set(ylabel="Day of call", xlabel="Call duration in seconds")
         plot.get_figure().savefig(
             "{}/call_duration.png".format(output_folder),
             bbox_inches='tight',
-            pad_inches=0.5
+            pad_inches=config.PAD_INCHES
         )
         plot.get_figure().clf()
 
@@ -93,14 +94,16 @@ class WeekdayMessagesGraph(Grapher):
             hue=to_plot[config.SENDER_COLUMN_NAME],
             data=to_plot,
             order=constants.WEEKDAYS,
-            palette = "muted"
+            palette = config.PALETTE
         )
-        plot.set(xlabel="Day of the week", ylabel="Messages sent")
+
+        plt.suptitle("Messages by weekday", y = 1)
+        plot.set(xlabel='', ylabel='')
         plot.legend(bbox_to_anchor=(1.04,1), loc="upper left")
         plot.get_figure().savefig(
             "{}/weekday_messages.png".format(output_folder),
             bbox_inches='tight',
-            pad_inches=0.5
+            pad_inches=config.PAD_INCHES
         )
         plot.get_figure().clf()
 
@@ -117,14 +120,15 @@ class TopDaysMessagesGraph(Grapher):
             hue=to_plot[config.SENDER_COLUMN_NAME],
             data=to_plot,
             order=to_plot.groupby('date').type.sum().sort_values(ascending=False).head(5).index,
-            palette = "muted"
+            palette = config.PALETTE
         )
-        plot.set(xlabel="Top 5 Days With Most Messages", ylabel="Messages sent")
+        plt.suptitle("Days with the most messages", y = 1)
+        plot.set(xlabel='', ylabel='')
         plot.legend(bbox_to_anchor=(1.04,1), loc="upper left")
         plot.get_figure().savefig(
             "{}/top_days_messages.png".format(output_folder),
             bbox_inches='tight',
-            pad_inches=0.5
+            pad_inches=config.PAD_INCHES
         )
         plot.get_figure().clf()
 
@@ -144,14 +148,15 @@ class TimeInDayMessagesGraph(Grapher):
             x='time',
             y='type',
             hue=config.SENDER_COLUMN_NAME,
-            palette = "muted"
+            palette = config.PALETTE
         )
-        plot.set(xlabel="Hour in Day", ylabel="Messages sent")
+        plt.suptitle("Messages by hour of day", y = 1)
+        plot.set(xlabel='', ylabel='')
         plot.legend(bbox_to_anchor=(1.04,1), loc="upper left")
         plot.get_figure().savefig(
             "{}/time_in_day_messages.png".format(output_folder),
             bbox_inches='tight',
-            pad_inches=0.5
+            pad_inches=config.PAD_INCHES
         )
         plot.get_figure().clf()
 
@@ -169,16 +174,16 @@ class PerTermMessagesGraph(Grapher):
             x='type',
             hue=config.SENDER_COLUMN_NAME,
             orient='h',
-            palette = "muted"
+            palette = config.PALETTE
         )
-        plot.set(ylabel="Terms", xlabel="Messages sent")
-
+        plt.suptitle("Messages by trimester", y = 1)
+        plot.set(xlabel='', ylabel='')
         plot.legend(bbox_to_anchor=(1.04,1), loc="upper left")
 
         plot.get_figure().savefig(
             "{}/per_term_messages.png".format(output_folder),
             bbox_inches='tight',
-            pad_inches=0.5
+            pad_inches=config.PAD_INCHES
         )
         plot.get_figure().clf()
 
@@ -197,14 +202,16 @@ class TopStickersMessagesGraph(Grapher):
             data=to_plot,
             hue_order=to_plot[config.SENDER_COLUMN_NAME].unique(),
             order=to_plot.groupby('sticker').type.sum().sort_values(ascending=False).head(10).index,
-            palette = "muted"
+            palette = config.PALETTE
         )
 
         sticker_files = ["{}/{}".format(parent_folder, t.get_text())  for t in plot.get_xticklabels()]
 
         def plotImage(x, y, im):
             # TODO hard-coded size of images, breaks in some cases
-            bb = Bbox.from_bounds(x,y,1, 2)
+            width = 1
+            height = 2
+            bb = Bbox.from_bounds(x,y,width, height)
             bb2 = TransformedBbox(bb,plot.transData)
             bbox_image = BboxImage(bb2,
                                 norm = None,
@@ -216,19 +223,20 @@ class TopStickersMessagesGraph(Grapher):
 
         # TODO hard coded coordinates of images, breaks in some cases
         x = -0.5
-        y = plot.patches[0].get_y()-2
+        y = plot.patches[0].get_y()-2.5
         for file in sticker_files:
             img =  plt.imread(file)
             plotImage(x, y, img)
             x += 1
 
-        plot.set(xlabel="Top 10 Stickers Used", ylabel="Occurrences", xticklabels=[])
+        plt.suptitle("Most frequent stickers", y = 1)
+        plot.set(xlabel='', ylabel='', xticklabels=[])
         plot.legend(bbox_to_anchor=(1.04,1), loc="upper left")
         plot.xaxis.labelpad = 25
         plot.get_figure().savefig(
             "{}/top_stickers.png".format(output_folder),
             bbox_inches='tight',
-            pad_inches=0.5
+            pad_inches=config.PAD_INCHES
         )
         plot.get_figure().clf()
 
@@ -248,9 +256,10 @@ class WordsPerMessageGraph(Grapher):
             data=to_plot,
             y='num_words',
             x=config.SENDER_COLUMN_NAME,
-            palette = "muted"
+            palette = config.PALETTE
         )
-        plot.set(ylabel="Average words per message", xlabel="Sender")
+        plt.suptitle("Average number of words per message", y = 1)
+        plot.set(xlabel='', ylabel='')
 
         # add number text above each bar
         for rect, label in zip(plot.patches, to_plot.values.tolist()):
@@ -267,7 +276,7 @@ class WordsPerMessageGraph(Grapher):
         plot.get_figure().savefig(
             "{}/words_per_message.png".format(output_folder),
             bbox_inches='tight',
-            pad_inches=0.5
+            pad_inches=config.PAD_INCHES
         )
         plot.get_figure().clf()
 
@@ -300,20 +309,18 @@ class WordCountGraph(Grapher):
             x=to_plot['n_w'],
             hue=to_plot[config.SENDER_COLUMN_NAME],
             data=to_plot,
-            palette = "muted",
+            palette = config.PALETTE,
             orient="h",
             order=to_plot.groupby('word').n_w.sum().sort_values(ascending=False).head(10).index,
         )
 
-        plot.set(
-            ylabel="Most common words (after filtering out most common English words)",
-            xlabel="Occurrences"
-        )
+        plt.suptitle("Most common words (after filtering out most common English words)", y = 1)
+        plot.set(xlabel='', ylabel='')
         plot.legend(bbox_to_anchor=(1.04,1), loc="upper left")
         plot.get_figure().savefig(
             "{}/word_count_filtered_total.png".format(output_folder),
             bbox_inches='tight',
-            pad_inches=0.5
+            pad_inches=config.PAD_INCHES
         )
         plot.get_figure().clf()
 
@@ -333,19 +340,16 @@ class NameGraph(Grapher):
             y=to_plot['n_w'],
             hue=to_plot[config.SENDER_COLUMN_NAME],
             data=to_plot,
-            palette = "muted",
+            palette = config.PALETTE,
         )
 
-        plot.set(
-            xlabel="Name said in chat",
-            ylabel="Occurrences",
-            xticklabels=["\"{}\"".format(x) for x in first_names]
-        )
+        plt.suptitle("Names said in chat", y = 1)
+        plot.set(xlabel='', ylabel='', xticklabels=["\"{}\"".format(x) for x in first_names])
         plot.legend(bbox_to_anchor=(1.04,1), loc="upper left")
         plot.get_figure().savefig(
             "{}/names.png".format(output_folder),
             bbox_inches='tight',
-            pad_inches=0.5
+            pad_inches=config.PAD_INCHES
         )
         plot.get_figure().clf()
 
@@ -363,29 +367,27 @@ class EmojiCountGraph(Grapher):
             y=to_plot['n_w'],
             hue=to_plot[config.SENDER_COLUMN_NAME],
             data=to_plot,
-            palette = "muted",
+            palette = config.PALETTE,
             order=to_plot.groupby('word')[['n_w']].sum().sort_values('n_w',ascending=False).head(10).index,
         )
 
         util.add_custom_fonts()
 
         for item in plot.get_xticklabels():
-            item.set_family('Symbola')
+            item.set_family('EmojiOne')
             item.set_fontsize(20)
 
         emojis = [x.get_text() for x in plot.get_xticklabels()]
         print("Your top emojis:")
         print("   ".join(["{}. {}".format(i+1, e) for i, e in enumerate(emojis)]))
 
-        plot.set(
-            xlabel="Most common emoji",
-            ylabel="Occurrences"
-        )
+        plt.suptitle("Most frequent emoji", y = 1)
+        plot.set(xlabel='', ylabel='')
         plot.legend(bbox_to_anchor=(1.04,1), loc="upper left")
         plot.get_figure().savefig(
             "{}/emoji_total.png".format(output_folder),
             bbox_inches='tight',
-            pad_inches=0.5
+            pad_inches=config.PAD_INCHES
         )
         plot.get_figure().clf()
 
@@ -420,19 +422,19 @@ class SenderDistinguishingWordsGraph(Grapher):
                 y=to_plot['word'],
                 x=to_plot['tf_idf'],
                 data=to_plot,
-                palette = "muted",
+                palette = config.PALETTE,
                 orient="h",
                 ax=ax[int(i / cols)][i % cols]
             )
             plot.set(
-                ylabel="Most distinguishing words",
-                xlabel="Uniqueness Score"
+                ylabel="",
+                xlabel="Distinctiveness Score"
             )
 
         fig.savefig(
             "{}/sender_distinguishing_words.png".format(output_folder),
             bbox_inches='tight',
-            pad_inches=0.5
+            pad_inches=config.PAD_INCHES
         )
         fig.clf()
 
@@ -467,19 +469,19 @@ class TermDistinguishingWordsGraph(Grapher):
                 y=to_plot['word'],
                 x=to_plot['tf_idf'],
                 data=to_plot,
-                palette = "muted",
+                palette = config.PALETTE,
                 orient="h",
                 ax=ax[int(i / cols)][i % cols]
             )
             plot.set(
-                ylabel="Most distinguishing words",
-                xlabel="Uniqueness Score"
+                ylabel="",
+                xlabel="Distinctiveness Score"
             )
 
         fig.savefig(
             "{}/term_distinguishing_words.png".format(output_folder),
             bbox_inches='tight',
-            pad_inches=0.5
+            pad_inches=config.PAD_INCHES
         )
         fig.clf()
 
@@ -497,20 +499,18 @@ class HashtagGraph(Grapher):
             x=to_plot['n_w'],
             hue=to_plot[config.SENDER_COLUMN_NAME],
             data=to_plot,
-            palette = "muted",
+            palette = config.PALETTE,
             orient="h",
             order=to_plot.groupby('word').n_w.sum().sort_values(ascending=False).head(10).index,
         )
 
-        plot.set(
-            ylabel="Most common hashtags",
-            xlabel="Occurrences"
-        )
+        plt.suptitle("Most frequent hashtags", y = 1)
+        plot.set(xlabel='', ylabel='')
         plot.legend(bbox_to_anchor=(1.04,1), loc="upper left")
         plot.get_figure().savefig(
             "{}/hashtags.png".format(output_folder),
             bbox_inches='tight',
-            pad_inches=0.5
+            pad_inches=config.PAD_INCHES
         )
         plot.get_figure().clf()
 

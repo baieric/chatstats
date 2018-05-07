@@ -74,4 +74,10 @@ for grapher in word_graphers:
 
 Here we create two different dataframes, `messages` and `words`, which are called by graphers in corresponding `message_graphers` and `word_graphers` lists. For ChatStats to use a newly created grapher, it must be added to the appropriate list.
 
-If your graph is complex enough that it needs a new dataframe, create it along with a corresponding list of graphers that use it, similar to the above snippet.
+If your graph is complex enough that it needs a new dataframe, create it along with a corresponding list of graphers that use it.
+
+## Thanks
+
+Thanks to my girlfriend, Camille, for motivating me to build this tool so we could look through our chat history together.
+
+I'd also like to thank /u/sumisel on Reddit. [Their /r/dataisbeautiful post](https://www.reddit.com/r/dataisbeautiful/comments/8br5hq/made_this_for_my_bf_on_our_one_year_anniversary_oc/) was the inspiration for this project.

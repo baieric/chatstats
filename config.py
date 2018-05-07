@@ -16,3 +16,9 @@ TERM_SUFFIX = {
 # which column to use to label senders
 # either "sender_name" (full name) or "sender_first_name" (first name only)
 SENDER_COLUMN_NAME = "sender_first_name"
+
+# colour palette for seaborn plots
+PALETTE = "muted"
+
+# padding around the plot image
+PAD_INCHES = 0.1

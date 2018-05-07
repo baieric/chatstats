@@ -24,6 +24,7 @@ def clean_data(data):
     data['datetime'] = pd.DatetimeIndex(
         pd.to_datetime(data['timestamp'],unit='s')
     ).tz_localize('UTC').tz_convert(config.TIMEZONE)
+
     # column for just date
     data['date'] = data["datetime"].apply(
         lambda d : datetime.datetime(year=d.year, month=d.month, day=d.day)
