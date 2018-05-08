@@ -1,3 +1,4 @@
 emoji
 seaborn
 ftfy
+python-slugify

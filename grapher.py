@@ -6,6 +6,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from matplotlib.image import BboxImage
 from matplotlib.transforms import Bbox, TransformedBbox
+from slugify import slugify
 
 import constants
 import util
@@ -46,10 +47,11 @@ class SenderMessagesGraph(Grapher):
                 va='bottom'
             )
 
-        plt.suptitle("Number of messages sent", y = 1)
+        TITLE = "Number of messages sent"
+        plt.suptitle(TITLE, y = 1)
         plot.set(xlabel='', ylabel='')
         plot.get_figure().savefig(
-            "{}/sender_messages.png".format(output_folder),
+            "{}/{}.png".format(output_folder, slugify(TITLE)),
             bbox_inches='tight',
             pad_inches=config.PAD_INCHES
         )
@@ -70,10 +72,12 @@ class CallDurationGraph(Grapher):
             orient='h',
             palette = config.PALETTE
         )
-        plt.suptitle("Longest calls", y = 1)
+
+        TITLE = "Longest calls"
+        plt.suptitle(TITLE, y = 1)
         plot.set(ylabel="Day of call", xlabel="Call duration in seconds")
         plot.get_figure().savefig(
-            "{}/call_duration.png".format(output_folder),
+            "{}/{}.png".format(output_folder, slugify(TITLE)),
             bbox_inches='tight',
             pad_inches=config.PAD_INCHES
         )
@@ -97,11 +101,12 @@ class WeekdayMessagesGraph(Grapher):
             palette = config.PALETTE
         )
 
-        plt.suptitle("Messages by weekday", y = 1)
+        TITLE = "Messages by weekday"
+        plt.suptitle(TITLE, y = 1)
         plot.set(xlabel='', ylabel='')
         plot.legend(bbox_to_anchor=(1.04,1), loc="upper left")
         plot.get_figure().savefig(
-            "{}/weekday_messages.png".format(output_folder),
+            "{}/{}.png".format(output_folder, slugify(TITLE)),
             bbox_inches='tight',
             pad_inches=config.PAD_INCHES
         )
@@ -122,11 +127,12 @@ class TopDaysMessagesGraph(Grapher):
             order=to_plot.groupby('date').type.sum().sort_values(ascending=False).head(5).index,
             palette = config.PALETTE
         )
-        plt.suptitle("Days with the most messages", y = 1)
+        TITLE = "Days with the most messages"
+        plt.suptitle(TITLE, y = 1)
         plot.set(xlabel='', ylabel='')
         plot.legend(bbox_to_anchor=(1.04,1), loc="upper left")
         plot.get_figure().savefig(
-            "{}/top_days_messages.png".format(output_folder),
+            "{}/{}.png".format(output_folder, slugify(TITLE)),
             bbox_inches='tight',
             pad_inches=config.PAD_INCHES
         )
@@ -150,11 +156,12 @@ class TimeInDayMessagesGraph(Grapher):
             hue=config.SENDER_COLUMN_NAME,
             palette = config.PALETTE
         )
-        plt.suptitle("Messages by hour of day", y = 1)
+        TITLE = "Messages by hour of day"
+        plt.suptitle(TITLE, y = 1)
         plot.set(xlabel='', ylabel='')
         plot.legend(bbox_to_anchor=(1.04,1), loc="upper left")
         plot.get_figure().savefig(
-            "{}/time_in_day_messages.png".format(output_folder),
+            "{}/{}.png".format(output_folder, slugify(TITLE)),
             bbox_inches='tight',
             pad_inches=config.PAD_INCHES
         )
@@ -176,12 +183,14 @@ class PerTermMessagesGraph(Grapher):
             orient='h',
             palette = config.PALETTE
         )
-        plt.suptitle("Messages by trimester", y = 1)
+
+        TITLE = "Messages by trimester"
+        plt.suptitle(TITLE, y = 1)
         plot.set(xlabel='', ylabel='')
         plot.legend(bbox_to_anchor=(1.04,1), loc="upper left")
 
         plot.get_figure().savefig(
-            "{}/per_term_messages.png".format(output_folder),
+            "{}/{}.png".format(output_folder, slugify(TITLE)),
             bbox_inches='tight',
             pad_inches=config.PAD_INCHES
         )
@@ -229,12 +238,13 @@ class TopStickersMessagesGraph(Grapher):
             plotImage(x, y, img)
             x += 1
 
-        plt.suptitle("Most frequent stickers", y = 1)
+        TITLE = "Most frequent stickers"
+        plt.suptitle(TITLE, y = 1)
         plot.set(xlabel='', ylabel='', xticklabels=[])
         plot.legend(bbox_to_anchor=(1.04,1), loc="upper left")
         plot.xaxis.labelpad = 25
         plot.get_figure().savefig(
-            "{}/top_stickers.png".format(output_folder),
+            "{}/{}.png".format(output_folder, slugify(TITLE)),
             bbox_inches='tight',
             pad_inches=config.PAD_INCHES
         )
@@ -258,8 +268,6 @@ class WordsPerMessageGraph(Grapher):
             x=config.SENDER_COLUMN_NAME,
             palette = config.PALETTE
         )
-        plt.suptitle("Average number of words per message", y = 1)
-        plot.set(xlabel='', ylabel='')
 
         # add number text above each bar
         for rect, label in zip(plot.patches, to_plot.values.tolist()):
@@ -273,8 +281,12 @@ class WordsPerMessageGraph(Grapher):
                 va='bottom'
             )
 
+        TITLE = "Average number of words per message"
+        plt.suptitle(TITLE, y = 1)
+        plot.set(xlabel='', ylabel='')
+
         plot.get_figure().savefig(
-            "{}/words_per_message.png".format(output_folder),
+            "{}/{}.png".format(output_folder, slugify(TITLE)),
             bbox_inches='tight',
             pad_inches=config.PAD_INCHES
         )
@@ -314,11 +326,12 @@ class WordCountGraph(Grapher):
             order=to_plot.groupby('word').n_w.sum().sort_values(ascending=False).head(10).index,
         )
 
-        plt.suptitle("Most common words (after filtering out most common English words)", y = 1)
+        TITLE = "Most common words"
+        plt.suptitle(TITLE, y = 1)
         plot.set(xlabel='', ylabel='')
         plot.legend(bbox_to_anchor=(1.04,1), loc="upper left")
         plot.get_figure().savefig(
-            "{}/word_count_filtered_total.png".format(output_folder),
+            "{}/{}.png".format(output_folder, slugify(TITLE)),
             bbox_inches='tight',
             pad_inches=config.PAD_INCHES
         )
@@ -343,11 +356,12 @@ class NameGraph(Grapher):
             palette = config.PALETTE,
         )
 
-        plt.suptitle("Names said in chat", y = 1)
+        TITLE = "Names said in chat"
+        plt.suptitle(TITLE, y = 1)
         plot.set(xlabel='', ylabel='', xticklabels=["\"{}\"".format(x) for x in first_names])
         plot.legend(bbox_to_anchor=(1.04,1), loc="upper left")
         plot.get_figure().savefig(
-            "{}/names.png".format(output_folder),
+            "{}/{}.png".format(output_folder, slugify(TITLE)),
             bbox_inches='tight',
             pad_inches=config.PAD_INCHES
         )
@@ -381,11 +395,12 @@ class EmojiCountGraph(Grapher):
         print("Your top emojis:")
         print("   ".join(["{}. {}".format(i+1, e) for i, e in enumerate(emojis)]))
 
-        plt.suptitle("Most frequent emoji", y = 1)
+        TITLE = "Most frequent emoji"
+        plt.suptitle(TITLE, y = 1)
         plot.set(xlabel='', ylabel='')
         plot.legend(bbox_to_anchor=(1.04,1), loc="upper left")
         plot.get_figure().savefig(
-            "{}/emoji_total.png".format(output_folder),
+            "{}/{}.png".format(output_folder, slugify(TITLE)),
             bbox_inches='tight',
             pad_inches=config.PAD_INCHES
         )
@@ -404,7 +419,6 @@ class SenderDistinguishingWordsGraph(Grapher):
         rows, cols = util.get_rows_cols(N)
 
         fig, ax = plt.subplots(figsize=(cols * 2, rows * 3), ncols=cols, nrows=rows, squeeze=False)
-        plt.suptitle("Our Most Distinguishing Words", y = 1.09, fontsize=20)
         plt.subplots_adjust(
             left    =  0.2,
             bottom  =  0.1,
@@ -431,8 +445,10 @@ class SenderDistinguishingWordsGraph(Grapher):
                 xlabel="Distinctiveness Score"
             )
 
+        TITLE = "Our Most Distinguishing Words"
+        plt.suptitle(TITLE, y = 1.09, fontsize=20)
         fig.savefig(
-            "{}/sender_distinguishing_words.png".format(output_folder),
+            "{}/{}.png".format(output_folder, slugify(TITLE)),
             bbox_inches='tight',
             pad_inches=config.PAD_INCHES
         )
@@ -451,7 +467,6 @@ class TermDistinguishingWordsGraph(Grapher):
         rows, cols = util.get_rows_cols(N)
 
         fig, ax = plt.subplots(figsize=(cols * 2, rows * 3), ncols=cols, nrows=rows, squeeze=False)
-        plt.suptitle("Each Term's Most Distinguishing Words", y = 1.09, fontsize=20)
         plt.subplots_adjust(
             left    =  0.2,
             bottom  =  0.1,
@@ -478,8 +493,10 @@ class TermDistinguishingWordsGraph(Grapher):
                 xlabel="Distinctiveness Score"
             )
 
+        TITLE = "Each Term's Most Distinguishing Words"
+        plt.suptitle(TITLE, y = 1.09, fontsize=20)
         fig.savefig(
-            "{}/term_distinguishing_words.png".format(output_folder),
+            "{}/{}.png".format(output_folder, slugify(TITLE)),
             bbox_inches='tight',
             pad_inches=config.PAD_INCHES
         )
@@ -504,11 +521,12 @@ class HashtagGraph(Grapher):
             order=to_plot.groupby('word').n_w.sum().sort_values(ascending=False).head(10).index,
         )
 
-        plt.suptitle("Most frequent hashtags", y = 1)
+        TITLE = "Most frequent hashtags"
+        plt.suptitle(TITLE, y = 1)
         plot.set(xlabel='', ylabel='')
         plot.legend(bbox_to_anchor=(1.04,1), loc="upper left")
         plot.get_figure().savefig(
-            "{}/hashtags.png".format(output_folder),
+            "{}/{}.png".format(output_folder, slugify(TITLE)),
             bbox_inches='tight',
             pad_inches=config.PAD_INCHES
         )
