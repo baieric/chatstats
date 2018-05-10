@@ -8,6 +8,8 @@ ChatStats also works with group chats!
 
 ![Graph of most frequent emoji](examples/most-frequent-emoji.png "Graph of most frequent emoji")
 
+More examples can be found in [my blog post](http://ericbai.co/2017/05/10/i-made-some-data-visualizations-for-my-girlfriend/).
+
 ## Graphs
 
 * Average number of words per message
