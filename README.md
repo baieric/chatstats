@@ -2,7 +2,26 @@
 
 ChatStats is a data visualizer for a Facebook Messenger conversation. Try it out with your group chats or your significant other. You don't need to be an experienced programmer to use it!
 
-TODO: Examples here
+![Graph of our most distinguishing words](examples/our-most-distinguishing-words.png "Graph of our most distinguishing words")
+
+ChatStats also works with group chats!
+
+![Graph of most frequent emoji](examples/most-frequent-emoji.png "Graph of most frequent emoji")
+
+## Graphs
+
+* Average number of words per message
+* Days with the most messages
+* Each sender's most distinguishing words
+* Each term's most distinguishing words
+* Messages by hour of day
+* Messages by term
+* Messages by weekday
+* Most frequent stickers
+* Names said in chat
+* Number of messages sent
+
+And more!
 
 ## How To
 
@@ -22,8 +41,9 @@ To get your entire chat history:
 
 1. Go to [https://www.facebook.com/dyi](https://www.facebook.com/dyi). Select **"Download Your Information"**.
 2. On this page, change the Format option to `JSON`. You can deselect all information except for `Messages` to lower the size of your download. The other options can be left default or customized to your liking. Click `Create File` to continue.
-3. Facebook takes a few minutes to generate a download link for you. You can do **Step Two** while waiting for the file.
-4. Once you receive a notification from Facebook with a download link, save the file to your computer and unzip it. Note that this is very sensitive information, so be careful storing it.
+3. Facebook takes a few minutes to generate a download link for you. Once you receive a notification from Facebook with a download link, save the file to your computer and unzip it. You can do **Step Two** while waiting for the file to download.
+
+Note that your Facebook data contains very sensitive information, so be careful storing it.
 
 ### Step Two: Set Up ChatStats
 
