@@ -10,11 +10,24 @@ import string
 import emoji
 import ftfy
 import datetime
+import warnings
 
 from grapher import message_graphers, word_graphers
 import constants
 import config
 import util
+
+def clean_type(row):
+    if row.game:
+        return 'Game'
+    elif row.plan_update:
+        return 'Plan Update'
+    elif row.chat_update:
+        return 'Chat Update'
+    elif row.call_update:
+        return 'Call Update'
+    else:
+        return row.type
 
 def clean_data(data):
     '''
@@ -45,6 +58,18 @@ def clean_data(data):
         duplicate_likes,
         "messages/stickers_used/851557_369239266556155_759568595_n_369239263222822.png"
     )
+
+    # format text properly
+    data['content'] = data['content'].apply(lambda x: ftfy.ftfy(x) if type(x) == str else x)
+
+    # properly set message type, adding types 'Game', 'Plan Update', 'Chat Update'
+    warnings.filterwarnings("ignore", 'This pattern has match groups')
+    data['game'] = data['content'].str.contains(constants.GAME_REGEX, na=False)
+    data['plan_update'] = data['content'].str.contains(constants.PLAN_UPDATE_REGEX, na=False)
+    data['chat_update'] = data['content'].str.contains(constants.CHAT_UPDATE_REGEX, na=False)
+    data['call_update'] = data['content'].str.contains(constants.CALL_UPDATE_REGEX, na=False)
+
+    data['type'] = data.apply(lambda x: clean_type(x), axis=1)
 
     # add first name column
     data['sender_first_name'] = data['sender_name'].apply(lambda s: s.split()[0])
@@ -80,10 +105,6 @@ def word_data(data):
     ].iterrows():
         r = row[1]
         for word in r.words:
-            # normalize unicode
-            word = word.replace("\u00e2\u0080\u0099", "'")
-            word = ftfy.ftfy(word)
-
             if word in constants.EMOJI_SHORTCUTS:
                 rows.append( make_row(r, constants.EMOJI_SHORTCUTS[word], 'emoji') )
             elif word in emoji.UNICODE_EMOJI:
