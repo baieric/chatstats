@@ -3,12 +3,11 @@
 ## Bug Fixes and Improvements
 
 * fix how stickers look in graphs
-* figure out how to show better emojis in graphs
-* get consistent colours for the legend
-* fix/suppress warnings in plot_graph.py
-* get better word lists for filtering
+* figure out how to show Apple emojis in graphs
+* get consistent colours for the legend (i.e. fix the order of the senders in the legend)
+* fix/suppress warnings in grapher.py
+* get better word lists for filtering (to do a top words graph, ignoring common words)
 * auto-detect what properties to use for graphs based on number of people in the chat, number of messages, etc. ?
-* toggle for whether to show full names
 * show warning if two users have the same full name or first name, depending on config
 
 ## Web UI Idea
@@ -32,7 +31,7 @@ Word counting:
 Message content analysis (may require preprocessing):
 
 * first time saying I love you? lol
-* most common two-word pairs?
+* most common two-word pairs? (use n-grams)
 * change in frequency of certain words over time (maybe detect largest differences? most unique each month or term?)
 * which pairs talk to each other the most in a group chat
 * how long someone takes to respond
