@@ -20,6 +20,10 @@ class Grapher(object):
     def graph(self, data, output_folder, parent_folder):
         raise NotImplementedError( "Implement the graph function for a concrete Grapher" )
 
+    def __init__(self, type=None):
+        self.type = type
+
+
 class SenderMessagesGraph(Grapher):
     '''
     Plots the number of messages sent by each sender
@@ -411,6 +415,9 @@ class SenderDistinguishingWordsGraph(Grapher):
     Plots the most distinctive words per sender
     '''
     def graph(self, data, output_folder, parent_folder):
+        if self.type == None:
+            raise ValueError("Grapher type must be set to a string")
+
         data = util.group_words_by_sender(data, get_tfidf=True)
         data = data[data['word'].str.len() > 1]
         data = data[data['type'] == 'word']
@@ -445,7 +452,7 @@ class SenderDistinguishingWordsGraph(Grapher):
                 xlabel="Distinctiveness Score"
             )
 
-        TITLE = "Our Most Distinguishing Words"
+        TITLE = "Our Most Distinguishing {}".format(self.type)
         plt.suptitle(TITLE, y = 1.09, fontsize=20)
         fig.savefig(
             "{}/{}.png".format(output_folder, slugify(TITLE)),
@@ -459,6 +466,9 @@ class TermDistinguishingWordsGraph(Grapher):
     Plots the most distinctive words per term
     '''
     def graph(self, data, output_folder, parent_folder):
+        if self.type == None:
+            raise ValueError("Grapher type must be set to a string")
+
         data = util.group_words_by_term(data, get_tfidf=True)
         data = data[data['word'].str.len() > 1]
         data = data[data['type'] == 'word']
@@ -493,7 +503,7 @@ class TermDistinguishingWordsGraph(Grapher):
                 xlabel="Distinctiveness Score"
             )
 
-        TITLE = "Each Term's Most Distinguishing Words"
+        TITLE = "Each Term's Most Distinguishing {}".format(self.type)
         plt.suptitle(TITLE, y = 1.09, fontsize=20)
         fig.savefig(
             "{}/{}.png".format(output_folder, slugify(TITLE)),
@@ -546,8 +556,18 @@ message_graphers = [
 word_graphers = [
     EmojiCountGraph(),
     NameGraph(),
-    SenderDistinguishingWordsGraph(),
-    TermDistinguishingWordsGraph(),
+    SenderDistinguishingWordsGraph("Words"),
+    TermDistinguishingWordsGraph("Words"),
+]
+
+bigram_graphers = [
+    SenderDistinguishingWordsGraph("Bigrams"),
+    TermDistinguishingWordsGraph("Bigrams"),
+]
+
+trigram_graphers = [
+    SenderDistinguishingWordsGraph("Trigrams"),
+    TermDistinguishingWordsGraph("Trigrams"),
 ]
 
 # Unused:

@@ -12,7 +12,7 @@ import ftfy
 import datetime
 import warnings
 
-from grapher import message_graphers, word_graphers
+from grapher import message_graphers, word_graphers, bigram_graphers, trigram_graphers
 import constants
 import config
 import util
@@ -76,6 +76,18 @@ def clean_data(data):
 
     return data
 
+def make_row(r, word, type):
+    return (
+        r.sender_name,
+        r.sender_first_name,
+        r.datetime,
+        r.date,
+        r.term,
+        word,
+        type,
+        1
+    )
+
 def word_data(data):
     '''
     Creates dataframe of words
@@ -86,41 +98,46 @@ def word_data(data):
     data = data.dropna(subset=['words'])
     data = data[data['type'] == 'Generic']
 
-    def make_row(r, word, type):
-        return (
-            r.sender_name,
-            r.sender_first_name,
-            r.datetime,
-            r.date,
-            r.term,
-            word,
-            type,
-            1
-        )
-
     # create word count dataframe
-    rows = list()
+    word_rows = list()
+    bigram_rows = list()
+    trigram_rows = list()
+
     for row in data[
         ['sender_name', 'sender_first_name', 'datetime', 'date', 'term', 'words']
     ].iterrows():
         r = row[1]
+
+        two_words_ago = None
+        one_word_ago = None
+
         for word in r.words:
             if word in constants.EMOJI_SHORTCUTS:
-                rows.append( make_row(r, constants.EMOJI_SHORTCUTS[word], 'emoji') )
+                word_rows.append( make_row(r, constants.EMOJI_SHORTCUTS[word], 'emoji') )
             elif word in emoji.UNICODE_EMOJI:
-                rows.append( make_row(r, word, 'emoji') )
+                word_rows.append( make_row(r, word, 'emoji') )
             elif util.is_hashtag(word):
-                rows.append( make_row(r, word, 'hashtag') )
+                word_rows.append( make_row(r, word, 'hashtag') )
             else:
                 for c in word:
                     if c in emoji.UNICODE_EMOJI:
-                        rows.append( make_row(r, c, 'emoji') )
+                        word_rows.append( make_row(r, c, 'emoji') )
 
                 word = word.lower().strip(string.punctuation)
                 if len(word) > 0:
-                    rows.append( make_row(r, word, 'word') )
+                    word_rows.append( make_row(r, word, 'word') )
 
-    words = pd.DataFrame(rows, columns=[
+            if two_words_ago is not None:
+                trigram = "{} {} {}".format(two_words_ago, one_word_ago, word)
+                trigram_rows.append( make_row(r, trigram, 'word') )
+            two_words_ago = one_word_ago
+
+            if one_word_ago is not None:
+                bigram = "{} {}".format(one_word_ago, word)
+                bigram_rows.append( make_row(r, bigram, 'word') )
+            one_word_ago = word
+
+    column_names = [
         'sender_name',
         'sender_first_name',
         'datetime',
@@ -129,9 +146,13 @@ def word_data(data):
         'word',
         'type',
         'n_w'
-    ])
+    ]
 
-    return words
+    words = pd.DataFrame(word_rows, columns=column_names)
+    bigrams = pd.DataFrame(bigram_rows, columns=column_names)
+    trigrams = pd.DataFrame(trigram_rows, columns=column_names)
+
+    return words, bigrams, trigrams
 
 def main(argv):
     if len(argv) != 2:
@@ -170,9 +191,15 @@ def main(argv):
         grapher.graph(messages, output_folder, parent_folder)
 
     # generate graphs that use word data
-    words = word_data(messages)
+    words, bigrams, trigrams = word_data(messages)
     for grapher in word_graphers:
         grapher.graph(words, output_folder, parent_folder)
+
+    for grapher in bigram_graphers:
+        grapher.graph(bigrams, output_folder, parent_folder)
+
+    for grapher in trigram_graphers:
+        grapher.graph(trigrams, output_folder, parent_folder)
 
     print("Results saved in {}".format(output_folder))
 
