@@ -31,7 +31,6 @@ Word counting:
 Message content analysis (may require preprocessing):
 
 * first time saying I love you? lol
-* most common two-word pairs? (use n-grams)
 * change in frequency of certain words over time (maybe detect largest differences? most unique each month or term?)
 * which pairs talk to each other the most in a group chat
 * how long someone takes to respond
