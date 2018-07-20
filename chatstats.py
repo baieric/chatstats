@@ -35,7 +35,7 @@ def clean_data(data):
     '''
     # set timezone
     data['datetime'] = pd.DatetimeIndex(
-        pd.to_datetime(data['timestamp'],unit='s')
+        pd.to_datetime(data['timestamp_ms'],unit='ms')
     ).tz_localize('UTC').tz_convert(config.TIMEZONE)
 
     # column for just date
