@@ -33,9 +33,9 @@ Note: Not tested on Windows.
 
 You will need the following installed:
 
-* Git
-* Python3
-* Pip3
+* [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+* [Python3](https://www.python.org/getit/)
+* Pip3 (should be included when installing Python3)
 
 ### Step One: Getting Your Facebook Data
 
