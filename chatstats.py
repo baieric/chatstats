@@ -175,7 +175,7 @@ def main(argv):
         json_file = "{}{}".format(chat_folder, CHAT_FILE)
 
     # get the parent folder of the messages directory
-    parent_folder = os.path.dirname(os.path.dirname(os.path.dirname(chat_folder)))
+    parent_folder = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(chat_folder))))
 
     # open json file as dict
     json_data = json.loads(open(json_file).read())
