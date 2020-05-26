@@ -92,7 +92,7 @@ class WeekdayMessagesGraph(Grapher):
     Plots the number of messages sent in each weekday
     '''
     def graph(self, data, output_folder, parent_folder):
-        data['weekday'] = data['datetime'].dt.weekday_name
+        data['weekday'] = data['datetime'].dt.day_name()
         to_plot = data.groupby(['weekday', config.SENDER_COLUMN_NAME], as_index=False)[['type']].count()
 
         sns.set(style="darkgrid")
@@ -556,6 +556,7 @@ message_graphers = [
 word_graphers = [
     EmojiCountGraph(),
     NameGraph(),
+    HashtagGraph(),
     SenderDistinguishingWordsGraph("Words"),
     TermDistinguishingWordsGraph("Words"),
 ]
@@ -571,6 +572,5 @@ trigram_graphers = [
 ]
 
 # Unused:
-# HashtagGraph(),
 # CallDurationGraph(),
 # WordCountGraph(),
