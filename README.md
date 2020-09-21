@@ -82,6 +82,10 @@ Have fun! If you need help deciding what conversations to try, [sort your `messa
 
 There are some advanced options available in the file `config.py`.
 
+## Something Not Working?
+
+Facebook's Download Your Information tool sometimes updates the format of your data, which can break this tool. If you notice something, please file an issue or make a pull request!
+
 ## Contribute
 
 Feel free to [request a feature](https://github.com/baieric/chatstats/issues/new) or make a pull request. There are ideas for bug fixes, improvements, and new graphs in [the project roadmap](https://github.com/baieric/chatstats/blob/master/ROADMAP.md).
