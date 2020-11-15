@@ -164,6 +164,8 @@ def main(argv):
     message_arg =  argv[1]
     CHAT_FILE = "message.json"
 
+    result_messages = []
+    json_template = {}
     # get messages.json and its directory
     if message_arg.endswith(CHAT_FILE):
         json_file = message_arg
@@ -173,6 +175,22 @@ def main(argv):
         if not chat_folder.endswith("/"):
             chat_folder = "{}/".format(chat_folder)
         json_file = "{}{}".format(chat_folder, CHAT_FILE)
+
+    for file in os.listdir(chat_folder):
+        if file.endswith(".json") and file != "message.json":
+            # Print the file name to debug
+            print(os.path.join(chat_folder, file))
+            with open(os.path.join(chat_folder, file)) as f:
+                data = json.load(f)
+                if (len(json_template) == 0):
+                    json_template = data
+                messages = data["messages"]
+                result_messages += messages
+
+    json_template['messages'] = result_messages
+
+    with open(os.path.join(chat_folder, "message.json"),'w') as f:
+        f.write(json.dumps(json_template, indent=2))
 
     # get the parent folder of the messages directory
     parent_folder = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(chat_folder))))
