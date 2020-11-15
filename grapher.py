@@ -238,8 +238,11 @@ class TopStickersMessagesGraph(Grapher):
         x = -0.5
         y = plot.patches[0].get_y()-2.5
         for file in sticker_files:
-            img =  plt.imread(file)
-            plotImage(x, y, img)
+            try:
+                img =  plt.imread(file)
+                plotImage(x, y, img)
+            except FileNotFoundError:
+                pass
             x += 1
 
         TITLE = "Most frequent stickers"

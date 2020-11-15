@@ -1,2 +1,3 @@
 *.pyc
 my_data
+.DS_Store
