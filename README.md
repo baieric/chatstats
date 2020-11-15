@@ -56,8 +56,9 @@ git clone https://github.com/baieric/chatstats.git
 ```
 2. Install the dependencies:
 ```
-pip3 install -r requirements.txt
+python3 -m pip install -r requirements.txt
 ```
+(If this fails, try running with `sudo` at the front.)
 
 ### Step Three: Generate Graphs!
 
