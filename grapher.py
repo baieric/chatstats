@@ -549,8 +549,7 @@ message_graphers = [
     TopDaysMessagesGraph(),
     TimeInDayMessagesGraph(),
     PerTermMessagesGraph(),
-    # ChatStats is failing to parse stickers right now! This is probably easy to fix, please file a pull request <3
-    # TopStickersMessagesGraph(),
+    TopStickersMessagesGraph(),
     WordsPerMessageGraph(),
 ]
 
