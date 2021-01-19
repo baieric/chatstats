@@ -13,7 +13,7 @@ import datetime
 import warnings
 
 from grapher import message_graphers, word_graphers, bigram_graphers, trigram_graphers
-import constants
+import chatstats_constants
 import config
 import util
 
@@ -64,10 +64,10 @@ def clean_data(data):
 
     # properly set message type, adding types 'Game', 'Plan Update', 'Chat Update'
     warnings.filterwarnings("ignore", 'This pattern has match groups')
-    data['game'] = data['content'].str.contains(constants.GAME_REGEX, na=False)
-    data['plan_update'] = data['content'].str.contains(constants.PLAN_UPDATE_REGEX, na=False)
-    data['chat_update'] = data['content'].str.contains(constants.CHAT_UPDATE_REGEX, na=False)
-    data['call_update'] = data['content'].str.contains(constants.CALL_UPDATE_REGEX, na=False)
+    data['game'] = data['content'].str.contains(chatstats_constants.GAME_REGEX, na=False)
+    data['plan_update'] = data['content'].str.contains(chatstats_constants.PLAN_UPDATE_REGEX, na=False)
+    data['chat_update'] = data['content'].str.contains(chatstats_constants.CHAT_UPDATE_REGEX, na=False)
+    data['call_update'] = data['content'].str.contains(chatstats_constants.CALL_UPDATE_REGEX, na=False)
 
     data['type'] = data.apply(lambda x: clean_type(x), axis=1)
 
@@ -112,8 +112,8 @@ def word_data(data):
         one_word_ago = None
 
         for word in r.words:
-            if word in constants.EMOJI_SHORTCUTS:
-                word_rows.append( make_row(r, constants.EMOJI_SHORTCUTS[word], 'emoji') )
+            if word in chatstats_constants.EMOJI_SHORTCUTS:
+                word_rows.append( make_row(r, chatstats_constants.EMOJI_SHORTCUTS[word], 'emoji') )
             elif word in emoji.UNICODE_EMOJI:
                 word_rows.append( make_row(r, word, 'emoji') )
             elif util.is_hashtag(word):

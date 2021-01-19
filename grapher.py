@@ -8,7 +8,7 @@ from matplotlib.image import BboxImage
 from matplotlib.transforms import Bbox, TransformedBbox
 from slugify import slugify
 
-import constants
+import chatstats_constants
 import util
 import config
 
@@ -101,7 +101,7 @@ class WeekdayMessagesGraph(Grapher):
             y=to_plot['type'],
             hue=to_plot[config.SENDER_COLUMN_NAME],
             data=to_plot,
-            order=constants.WEEKDAYS,
+            order=chatstats_constants.WEEKDAYS,
             palette = config.PALETTE
         )
 
